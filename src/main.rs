@@ -11,8 +11,9 @@ impl GameState for State {
 
 fn main() -> rltk::BError {
     use rltk::RltkBuilder;
-    let context = RltkBuilder::simple80x50()
-    //let context = RltkBuilder::simple<u32>(80, 60)
+    //let context = RltkBuilder::simple80x50()
+    let context = RltkBuilder::simple(40, 80)
+        .unwrap_or_default()
         .with_title("Roguelike Tutorial")
         .build()?;
     let gs = State{ };
