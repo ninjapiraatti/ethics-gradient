@@ -1,3 +1,4 @@
+extern crate rltk; // Apparently this is not needed for the "new" versions of Rust?
 use rltk::{Rltk, GameState};
 
 struct State {}
