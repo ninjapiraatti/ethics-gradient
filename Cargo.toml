@@ -10,4 +10,4 @@ authors = [
 name = "ethics-gradient"
 
 [dependencies]
-rltk = "0.8.1"
+rltk = { version = "0.8.0" }
