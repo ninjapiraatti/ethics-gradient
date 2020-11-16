@@ -11,3 +11,4 @@ name = "ethics-gradient"
 
 [dependencies]
 rltk = { version = "0.8.1" }
+array2d = "0.2.1"
