@@ -6,6 +6,8 @@ struct State {}
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
+        let hexes = generate_hex::generate_hex(1);
+        /*
         ctx.print(2, 2, "0x001f44  0x11a030  0x5020aa  0x002f44");
         ctx.print(2, 4, "0x001f44  0x11a030  0x5020aa  0x11b030");
         ctx.print(2, 6, "0x001f44  0x11a030  0x5020aa  0x002f44");
@@ -23,6 +25,8 @@ impl GameState for State {
         ctx.print(2, 30, "0x001f44  0x11a030  0x5020aa  0x002f44");
         ctx.print(2, 32, "0x001f44  0x11a030  0x5020aa  0x11b030");
         ctx.print(2, 36, "Lvl 0001  Tm  0001  Mvs 0000  Scr 0000");
+        */
+        println!("{:?}", hexes)
     }
 }
 

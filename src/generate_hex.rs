@@ -1,7 +1,7 @@
 extern crate array2d;
-use array2d::Array2D;
+use self::array2d::Array2D;
 
-pub fn generate_hex(n: u32) -> Array2D {
+pub fn generate_hex(n: u32) -> Array2D<u32> {
     //const X: usize = 4;
     //const Y: usize = 16;
 
