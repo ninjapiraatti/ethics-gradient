@@ -1,3 +1,4 @@
+extern crate array2d;
 use array2d::Array2D;
 
 pub fn generate_hex(n: u32) -> Array2D {
