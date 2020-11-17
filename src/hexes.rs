@@ -10,12 +10,12 @@ pub fn generate_hex(_n: u32) -> Array2D<u32> {
     let mut hexes = Array2D::filled_with(2, 16, 4);
     //let mut hexes = Array2D::from_rows(&rows);
     let mut rng = rand::thread_rng();
-    let mut nbr = 0;
+    //let mut nbr = 0;
 
     for row in 0..ROWS {
         for col in 0..COLS {
             hexes.set(row, col, rng.gen_range(0, 2147483647));
-            println!("Row is {}, Col is {}, value is {}", row, col, hexes[(row, col)]);
+            //println!("Row is {}, Col is {}, value is {}", row, col, hexes[(row, col)]);
         }
     }
     hexes

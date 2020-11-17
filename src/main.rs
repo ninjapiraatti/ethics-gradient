@@ -1,6 +1,8 @@
 extern crate rltk;
 extern crate specs; 
 extern crate specs_derive;  // Apparently this is not needed for the "new" versions of Rust?
+extern crate array2d;
+use array2d::Array2D;
 use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
 use specs::prelude::*;
 use std::cmp::{max, min};
@@ -12,21 +14,22 @@ struct State {
     ecs: World
 }
 
-#[derive(Component)]
-struct Gamedata {
-    hexes:  array2d::Array2D<u32>,
-    level:  u32,
-    score:  u32
+pub fn init_gamedata() -> data::Gamedata {
+    let mut gamedata = data::Gamedata {
+        hexes: hexes::generate_hex(1),
+        level: 1,
+        score: 0
+    };
+    gamedata
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
-        let game = self.ecs.read_storage::<Gamedata>();
+        let gamedata = self.ecs.fetch::<data::Gamedata>();
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
-                //ctx.print(2 + (col * 10), 2 + row, .hexes[row][col]);
-                ctx.print(2 + (col * 10), 2 + row, game.hexes[row][col]);
+                ctx.print(2 + (col * 10), 2 + row, gamedata.hexes.get(row, col).unwrap());
             }
         }
         /*
@@ -61,14 +64,6 @@ fn main() -> rltk::BError {
     let mut gs = State {
         ecs: World::new()
     };
-    gs.ecs.register::<Gamedata>();
-    gs.ecs
-        .create_entity()
-        .with(Gamedata {
-            hexes: hexes::generate_hex(1),
-            level: 1,
-            score: 0
-        })
-        .build();
+    gs.ecs.insert(init_gamedata());
     rltk::main_loop(context, gs)
 }
