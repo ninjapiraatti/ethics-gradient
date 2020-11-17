@@ -12,3 +12,6 @@ name = "ethics-gradient"
 [dependencies]
 rltk = { version = "0.8.1" }
 array2d = "0.2.1"
+rand = "0.7.3"
+specs = "0.16.1"
+specs-derive = "0.4.1"

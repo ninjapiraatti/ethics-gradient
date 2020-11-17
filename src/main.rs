@@ -1,12 +1,34 @@
-extern crate rltk; // Apparently this is not needed for the "new" versions of Rust?
-mod generate_hex;
-use rltk::{Rltk, GameState};
+extern crate rltk;
+extern crate specs; 
+extern crate specs_derive;  // Apparently this is not needed for the "new" versions of Rust?
+use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
+use specs::prelude::*;
+use std::cmp::{max, min};
+use specs_derive::Component;
+mod hexes;
+mod data;
 
-struct State {}
+struct State {
+    ecs: World
+}
+
+#[derive(Component)]
+struct Gamedata {
+    hexes:  array2d::Array2D<u32>,
+    level:  u32,
+    score:  u32
+}
+
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
-        let hexes = generate_hex::generate_hex(1);
+        let game = self.ecs.read_storage::<Gamedata>();
+        for row in 0..hexes::ROWS {
+            for col in 0..hexes::COLS {
+                //ctx.print(2 + (col * 10), 2 + row, .hexes[row][col]);
+                ctx.print(2 + (col * 10), 2 + row, game.hexes[row][col]);
+            }
+        }
         /*
         ctx.print(2, 2, "0x001f44  0x11a030  0x5020aa  0x002f44");
         ctx.print(2, 4, "0x001f44  0x11a030  0x5020aa  0x11b030");
@@ -26,7 +48,6 @@ impl GameState for State {
         ctx.print(2, 32, "0x001f44  0x11a030  0x5020aa  0x11b030");
         ctx.print(2, 36, "Lvl 0001  Tm  0001  Mvs 0000  Scr 0000");
         */
-        println!("{:?}", hexes)
     }
 }
 
@@ -37,6 +58,17 @@ fn main() -> rltk::BError {
         .unwrap_or_default() // the simple above won't run without this
         .with_title("ethics-gradient")
         .build()?;
-    let gs = State{ };
+    let mut gs = State {
+        ecs: World::new()
+    };
+    gs.ecs.register::<Gamedata>();
+    gs.ecs
+        .create_entity()
+        .with(Gamedata {
+            hexes: hexes::generate_hex(1),
+            level: 1,
+            score: 0
+        })
+        .build();
     rltk::main_loop(context, gs)
 }
