@@ -16,43 +16,41 @@ struct State {
 
 pub fn init_gamedata() -> data::Gamedata {
     let mut gamedata = data::Gamedata {
-        hexes: hexes::generate_hex(1),
-        level: 1,
-        score: 0
+        hexes:  hexes::generate_hex(1),
+        level:  1,
+        score:  0,
+        posx:   0,
+        posy:   0
     };
     gamedata
+}
+
+fn player_input(gs: &mut State, ctx: &mut Rltk)
+{
+    match ctx.key {
+        None => {}
+        Some(key) => match key {
+            VirtualKeyCode::Left => println!("Left"),
+            VirtualKeyCode::Right => println!("Right"),
+            VirtualKeyCode::Up => println!("Up"),
+            VirtualKeyCode::Down => println!("Down"),
+            _ => {}
+        },
+    }
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
+        player_input(self, ctx);
         let gamedata = self.ecs.fetch::<data::Gamedata>();
         let mut hex = String::new();
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
                 hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
-                ctx.print(2 + (col * 10), 2 + row, hex);
+                ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.5, 0.5, 0.5), RGB::from_f32(0.9, 0., 0.), hex);
             }
         }
-        /*
-        ctx.print(2, 2, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 4, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 6, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 8, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 10, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 12, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 14, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 16, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 18, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 20, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 22, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 24, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 26, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 28, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 30, "0x001f44  0x11a030  0x5020aa  0x002f44");
-        ctx.print(2, 32, "0x001f44  0x11a030  0x5020aa  0x11b030");
-        ctx.print(2, 36, "Lvl 0001  Tm  0001  Mvs 0000  Scr 0000");
-        */
     }
 }
 
