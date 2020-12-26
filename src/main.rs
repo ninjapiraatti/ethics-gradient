@@ -27,9 +27,11 @@ impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
         let gamedata = self.ecs.fetch::<data::Gamedata>();
+        let mut hex = String::new();
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
-                ctx.print(2 + (col * 10), 2 + row, gamedata.hexes.get(row, col).unwrap());
+                hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
+                ctx.print(2 + (col * 10), 2 + row, hex);
             }
         }
         /*
