@@ -53,7 +53,7 @@ fn rotate_col(dir: usize, col: usize, ecs: &mut World) {
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
-        let mut gamedata = self.ecs.fetch_mut::<data::Gamedata>();
+        let mut gamedata = self.ecs.fetch::<data::Gamedata>();
         //player_input(self, ctx);
         let mut hex = String::new();
         for row in 0..hexes::ROWS {
@@ -62,10 +62,10 @@ impl GameState for State {
                 ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.9, 0.9, 0.9), RGB::from_f32(0.1, 0., 0.), hex);
             }
         }
-        let positions = self.ecs.read_storage::<Position>();
-        // for pos in &positions {
-        //     ctx.set(pos.x, pos.y);
-        // }
+        let mut positions = self.ecs.write_storage::<Position>();
+        for pos in positions.join() {
+            println!("{:?}", pos);
+        }
     }
 }
 
@@ -79,6 +79,7 @@ fn main() -> rltk::BError {
         ecs: World::new()
     };
     gs.ecs.register::<Position>();
+    gs.ecs.register::<data::Gamedata>();
     gs.ecs.insert(init_gamedata());
     gs.ecs
         .create_entity()
