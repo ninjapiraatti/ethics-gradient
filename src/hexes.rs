@@ -5,6 +5,8 @@ use self::rand::Rng;
 
 pub const COLS: usize = 4;
 pub const ROWS: usize = 16;
+pub const UP:   usize = 0;
+pub const DOWN: usize = 1;
 
 pub fn generate_hex(_n: u32) -> Array2D<u32> {
     let mut hexes = Array2D::filled_with(2, 16, 4);
@@ -18,5 +20,10 @@ pub fn generate_hex(_n: u32) -> Array2D<u32> {
             //println!("Row is {}, Col is {}, value is {}", row, col, hexes[(row, col)]);
         }
     }
+    hexes
+}
+
+pub fn rotate_col(dir: usize, col: usize) -> Array2D<u32> {
+    let mut hexes = Array2D::filled_with(2, 16, 4);
     hexes
 }
