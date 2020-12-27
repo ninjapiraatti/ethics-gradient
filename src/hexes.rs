@@ -22,8 +22,3 @@ pub fn generate_hex(_n: u32) -> Array2D<u32> {
     }
     hexes
 }
-
-pub fn rotate_col(dir: usize, col: usize) -> Array2D<u32> {
-    let mut hexes = Array2D::filled_with(2, 16, 4);
-    hexes
-}
