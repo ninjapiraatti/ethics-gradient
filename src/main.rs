@@ -48,7 +48,7 @@ impl GameState for State {
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
                 hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
-                ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.5, 0.5, 0.5), RGB::from_f32(0.9, 0., 0.), hex);
+                ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.5, 0.5, 0.5), RGB::from_f32(0.1, 0., 0.), hex);
             }
         }
     }
@@ -57,9 +57,11 @@ impl GameState for State {
 fn main() -> rltk::BError {
     use rltk::RltkBuilder;
     //let context = RltkBuilder::simple80x50()
-    let context = RltkBuilder::simple(42, 42)
-        .unwrap_or_default() // the simple above won't run without this
-        .with_title("ethics-gradient")
+    let context = RltkBuilder::vga(42, 42)
+        //.unwrap_or_default() // the simple above won't run without this
+        //.with_font("vga8x8.jpg", 8, 16)
+        //.with_automatic_console_resize(true)
+        .with_font("vga8x16.png", 8, 16)
         .build()?;
     let mut gs = State {
         ecs: World::new()
