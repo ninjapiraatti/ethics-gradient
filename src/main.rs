@@ -47,14 +47,16 @@ fn player_input(gs: &mut State, ctx: &mut Rltk)
 
 fn rotate_col(dir: usize, col: usize, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
-    //println!("{:?}", positions);
+    for pos in positions.join() {
+        println!("{:?}", pos);
+    }
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
+        player_input(self, ctx);
         let mut gamedata = self.ecs.fetch::<data::Gamedata>();
-        //player_input(self, ctx);
         let mut hex = String::new();
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
@@ -63,9 +65,6 @@ impl GameState for State {
             }
         }
         let mut positions = self.ecs.write_storage::<Position>();
-        for pos in positions.join() {
-            println!("{:?}", pos);
-        }
     }
 }
 
