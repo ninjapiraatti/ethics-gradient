@@ -5,8 +5,8 @@ use self::rand::Rng;
 
 pub const COLS: usize = 4;
 pub const ROWS: usize = 16;
-pub const UP:   usize = 0;
-pub const DOWN: usize = 1;
+//pub const UP:   usize = 0;
+//pub const DOWN: usize = 1;
 
 pub fn generate_hex(_n: u32) -> Array2D<u32> {
     let mut hexes = Array2D::filled_with(2, 16, 4);
@@ -16,7 +16,7 @@ pub fn generate_hex(_n: u32) -> Array2D<u32> {
 
     for row in 0..ROWS {
         for col in 0..COLS {
-            hexes.set(row, col, rng.gen_range(0, 2147483647));
+            hexes.set(row, col, rng.gen_range(0, 2147483647)).ok(); // What exactly does ok() do besides get rid of unused warning?
             //println!("Row is {}, Col is {}, value is {}", row, col, hexes[(row, col)]);
         }
     }
