@@ -24,8 +24,7 @@ pub fn init_gamedata() -> data::Gamedata {
         hexes:  hexes::generate_hex(1),
         level:  1,
         score:  0,
-        posx:   0,
-        posy:   0
+        time:   0,
     };
     gamedata
 }
@@ -59,10 +58,19 @@ fn rotate_col(x: i32, y: i32, ecs: &mut World) {
     println!("{:?}", y);
 }
 
+fn set_time(ecs: &mut World) {
+    let mut gamedata = ecs.write_storage::<data::Gamedata>();
+    for item in (&mut gamedata).join() { // Without the parentheses the whole thing is fucked.
+        println!("{:?}", item);
+        println!("helle");
+    }
+}
+
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
         player_input(self, ctx);
+        set_time(&mut self.ecs);
         let gamedata = self.ecs.fetch::<data::Gamedata>();
         let positions = self.ecs.read_storage::<Position>();
         for row in 0..hexes::ROWS {
@@ -71,6 +79,10 @@ impl GameState for State {
                 ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
             }
         }
+        //gamedata.time += 1;
+        ctx.print_color(2, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.level);
+        ctx.print_color(12, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.score);
+        ctx.print_color(22, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.time);
         for pos in positions.join() {
             ctx.print_color(pos.x, pos.y, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), '#');
         }
