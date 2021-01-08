@@ -58,12 +58,15 @@ impl GameState for State {
         ctx.cls();
         player_input(self, ctx);
         let gamedata = self.ecs.fetch::<data::Gamedata>();
+        let positions = self.ecs.read_storage::<Position>();
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
                 let hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
                 ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.9, 0.9, 0.9), RGB::from_f32(0.1, 0., 0.), hex);
             }
         }
+        //println!("{:?}", positions.get(positions).unwrap());
+        //ctx.print();
     }
 }
 
@@ -81,7 +84,7 @@ fn main() -> rltk::BError {
     gs.ecs.insert(init_gamedata());
     gs.ecs
         .create_entity()
-        .with(Position { x: 2, y: 2 })
+        .with(Position { x: 1, y: 1 })
         .build();
     rltk::main_loop(context, gs)
 }
