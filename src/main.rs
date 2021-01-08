@@ -35,22 +35,24 @@ fn player_input(gs: &mut State, ctx: &mut Rltk)
     match ctx.key {
         None => {}
         Some(key) => match key {
-            VirtualKeyCode::Left => rotate_col(0, 2, &mut gs.ecs),
-            VirtualKeyCode::Right => rotate_col(0, 2, &mut gs.ecs),
-            VirtualKeyCode::Up => rotate_col(0, 2, &mut gs.ecs),
-            VirtualKeyCode::Down => rotate_col(0, 2, &mut gs.ecs),
+            VirtualKeyCode::Left => rotate_col(-1, 0, &mut gs.ecs),
+            VirtualKeyCode::Right => rotate_col(1, 0, &mut gs.ecs),
+            VirtualKeyCode::Up => rotate_col(0, -1, &mut gs.ecs),
+            VirtualKeyCode::Down => rotate_col(0, 1, &mut gs.ecs),
             _ => {}
         },
     }
 }
 
-fn rotate_col(dir: usize, col: usize, ecs: &mut World) {
-    let positions = ecs.write_storage::<Position>();
-    for pos in positions.join() {
+fn rotate_col(x: i32, y: i32, ecs: &mut World) {
+    let mut positions = ecs.write_storage::<Position>();
+    for pos in (&mut positions).join() { // Without the parentheses the whole thing is fucked.
         println!("{:?}", pos);
+        pos.x += x;
+        pos.y += y;
     }
-    println!("{:?}", dir);
-    println!("{:?}", col);
+    println!("{:?}", x);
+    println!("{:?}", y);
 }
 
 impl GameState for State {
@@ -65,8 +67,9 @@ impl GameState for State {
                 ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.9, 0.9, 0.9), RGB::from_f32(0.1, 0., 0.), hex);
             }
         }
-        //println!("{:?}", positions.get(positions).unwrap());
-        //ctx.print();
+        for pos in positions.join() {
+            ctx.print_color(pos.x, pos.y, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), '#');
+        }
     }
 }
 
