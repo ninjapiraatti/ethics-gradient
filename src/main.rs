@@ -34,8 +34,8 @@ fn player_input(gs: &mut State, ctx: &mut Rltk)
     match ctx.key {
         None => {}
         Some(key) => match key {
-            VirtualKeyCode::Left => rotate_col(-10, 0, &mut gs.ecs),
-            VirtualKeyCode::Right => rotate_col(10, 0, &mut gs.ecs),
+            VirtualKeyCode::Left => rotate_col(-1, 0, &mut gs.ecs),
+            VirtualKeyCode::Right => rotate_col(1, 0, &mut gs.ecs),
             VirtualKeyCode::Up => rotate_col(0, -1, &mut gs.ecs),
             VirtualKeyCode::Down => rotate_col(0, 1, &mut gs.ecs),
             _ => {}
@@ -47,10 +47,10 @@ fn rotate_col(x: i32, y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
     for pos in (&mut positions).join() { // Without the parentheses the whole thing is fucked.
         println!("{:?}", pos);
-        if (pos.x + x > 0 && pos.x + x < 42) {
+        if pos.x + x > 0 && pos.x + x < 5 {
             pos.x += x;
         }
-        if (pos.y + y > 1 && pos.y + y < 18) {
+        if pos.y + y > 1 && pos.y + y < 18 {
             pos.y += y;
         }
     }
@@ -62,7 +62,7 @@ fn set_time(ecs: &mut World) {
     let mut gamedata = ecs.write_storage::<data::Gamedata>();
     for item in (&mut gamedata).join() { // Without the parentheses the whole thing is fucked.
         println!("{:?}", item);
-        println!("helle");
+        println!("hello");
     }
 }
 
@@ -75,17 +75,22 @@ impl GameState for State {
         let positions = self.ecs.read_storage::<Position>();
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
-                let hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
-                ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
+                for pos in positions.join() {
+                    let hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
+                    if pos.y - 1 == row as i32 && pos.x - 1 == col as i32 {
+                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 0.0), RGB::from_f32(0.1, 0., 0.), hex);
+                    } else if pos.x - 1 == col as i32 {
+                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
+                    }
+                    else {
+                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.8, 0.8, 0.8), RGB::from_f32(0.1, 0., 0.), hex);
+                    }
+                }
             }
         }
-        //gamedata.time += 1;
         ctx.print_color(2, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.level);
         ctx.print_color(12, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.score);
         ctx.print_color(22, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.time);
-        for pos in positions.join() {
-            ctx.print_color(pos.x, pos.y, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), '#');
-        }
     }
 }
 
