@@ -10,15 +10,21 @@ mod hexes;
 mod data;
 
 struct State {
-    ecs: World
+    ecs: World,
+    pub runstate : RunState
 }
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum RunState { Start, Running, Gameover }
 
 pub fn init_gamedata() -> data::Gamedata {
     let gamedata = data::Gamedata {
-        hexes:  hexes::generate_hex(1),
-        level:  1,
-        score:  0,
-        time:   2147483647,
+        hexes:      hexes::generate_hex(1),
+        level:      1,
+        score:      0,
+        time:       2147483647,
+        running:    false,
+        gameover:   false,
     };
     gamedata
 }
@@ -53,40 +59,46 @@ fn rotate_col(x: i32, y: i32, ecs: &mut World) {
         if pos.y + y > 1 && pos.y + y < 18 {
             pos.y += y;
         }
+        gamedata.hexes.set(pos.x as usize, pos.y as usize,10).ok();
     }
-    gamedata.level = 10;
 }
 
 fn set_time(ecs: &mut World) {
     let mut gamedata = ecs.write_resource::<data::Gamedata>();
-    gamedata.time -= 1;
+    gamedata.time -= 10;
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
-        player_input(self, ctx);
-        set_time(&mut self.ecs);
-        let gamedata = self.ecs.fetch::<data::Gamedata>();
-        let positions = self.ecs.read_storage::<data::Position>();
-        for row in 0..hexes::ROWS {
-            for col in 0..hexes::COLS {
-                for pos in positions.join() {
-                    let hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
-                    if pos.y - 1 == row as i32 && pos.x - 1 == col as i32 {
-                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
-                    } else if pos.x - 1 == col as i32 {
-                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
-                    }
-                    else {
-                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.8, 0.8, 0.8), RGB::from_f32(0.1, 0., 0.), hex);
+        if self.runstate == RunState::Running {
+            player_input(self, ctx);
+            set_time(&mut self.ecs);
+            let gamedata = self.ecs.fetch::<data::Gamedata>();
+            let positions = self.ecs.read_storage::<data::Position>();
+                for row in 0..hexes::ROWS {
+                    for col in 0..hexes::COLS {
+                        for pos in positions.join() {
+                            let hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
+                            if pos.y - 1 == row as i32 && pos.x - 1 == col as i32 {
+                                ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
+                            } else if pos.x - 1 == col as i32 {
+                                ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
+                            }
+                            else {
+                                ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.8, 0.8, 0.8), RGB::from_f32(0.1, 0., 0.), hex);
+                            }
+                        }
                     }
                 }
-            }
+            ctx.print_color(2, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:x}", gamedata.level));
+            ctx.print_color(12, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:x}", gamedata.score));
+            ctx.print_color(22, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:08x}", gamedata.time));
+        } else if self.runstate == RunState::Start {
+            ctx.print_color(2, 2, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), "Ethics-gradient v0.1");
+        } else {
+            ctx.print_color(2, 2, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), "Game over.");
         }
-        ctx.print_color(2, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:x}", gamedata.level));
-        ctx.print_color(12, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:x}", gamedata.score));
-        ctx.print_color(22, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:08x}", gamedata.time));
     }
 }
 
@@ -97,7 +109,8 @@ fn main() -> rltk::BError {
         .build()?;
     context.with_post_scanlines(true);
     let mut gs = State {
-        ecs: World::new()
+        ecs: World::new(),
+        runstate : RunState::Gameover
     };
     gs.ecs.register::<data::Position>();
     gs.ecs.register::<data::Gamedata>();
