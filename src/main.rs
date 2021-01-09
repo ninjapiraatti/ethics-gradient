@@ -5,18 +5,12 @@ extern crate array2d;
 use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
 use specs::prelude::*;
 //use std::cmp::{max, min};
-use specs_derive::Component;
+//use specs_derive::Component;
 mod hexes;
 mod data;
 
 struct State {
     ecs: World
-}
-
-#[derive(Component, Debug)]
-struct Position {
-    x: i32,
-    y: i32,
 }
 
 pub fn init_gamedata() -> data::Gamedata {
@@ -44,7 +38,8 @@ fn player_input(gs: &mut State, ctx: &mut Rltk)
 }
 
 fn rotate_col(x: i32, y: i32, ecs: &mut World) {
-    let mut positions = ecs.write_storage::<Position>();
+    let mut positions = ecs.write_storage::<data::Position>();
+    let mut gamedata = ecs.write_resource::<data::Gamedata>();
     for pos in (&mut positions).join() { // Without the parentheses the whole thing is fucked.
         println!("{:?}", pos);
         if pos.x + x > 0 && pos.x + x < 5 {
@@ -54,8 +49,8 @@ fn rotate_col(x: i32, y: i32, ecs: &mut World) {
             pos.y += y;
         }
     }
-    println!("{:?}", x);
-    println!("{:?}", y);
+    gamedata.level = 10;
+    //println!("{:?}", gamedata.hexes.get(x as usize, y as usize)); 
 }
 
 fn set_time(ecs: &mut World) {
@@ -72,13 +67,13 @@ impl GameState for State {
         player_input(self, ctx);
         set_time(&mut self.ecs);
         let gamedata = self.ecs.fetch::<data::Gamedata>();
-        let positions = self.ecs.read_storage::<Position>();
+        let positions = self.ecs.read_storage::<data::Position>();
         for row in 0..hexes::ROWS {
             for col in 0..hexes::COLS {
                 for pos in positions.join() {
                     let hex = format!("{:x}", gamedata.hexes.get(row, col).unwrap());
                     if pos.y - 1 == row as i32 && pos.x - 1 == col as i32 {
-                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 0.0), RGB::from_f32(0.1, 0., 0.), hex);
+                        ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
                     } else if pos.x - 1 == col as i32 {
                         ctx.print_color(2 + (col * 10), 2 + row, RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0.1, 0., 0.), hex);
                     }
@@ -103,12 +98,12 @@ fn main() -> rltk::BError {
     let mut gs = State {
         ecs: World::new()
     };
-    gs.ecs.register::<Position>();
+    gs.ecs.register::<data::Position>();
     gs.ecs.register::<data::Gamedata>();
     gs.ecs.insert(init_gamedata());
     gs.ecs
         .create_entity()
-        .with(Position { x: 2, y: 2 })
+        .with(data::Position { x: 2, y: 2 })
         .build();
     rltk::main_loop(context, gs)
 }
