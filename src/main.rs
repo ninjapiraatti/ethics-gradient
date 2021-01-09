@@ -18,7 +18,7 @@ pub fn init_gamedata() -> data::Gamedata {
         hexes:  hexes::generate_hex(1),
         level:  1,
         score:  0,
-        time:   0,
+        time:   2147483647,
     };
     gamedata
 }
@@ -32,9 +32,14 @@ fn player_input(gs: &mut State, ctx: &mut Rltk)
             VirtualKeyCode::Right => rotate_col(1, 0, &mut gs.ecs),
             VirtualKeyCode::Up => rotate_col(0, -1, &mut gs.ecs),
             VirtualKeyCode::Down => rotate_col(0, 1, &mut gs.ecs),
+            VirtualKeyCode::Space => finish_level(&mut gs.ecs),
             _ => {}
         },
     }
+}
+
+fn finish_level(ecs: &mut World) {
+    println!("Finished level!");
 }
 
 fn rotate_col(x: i32, y: i32, ecs: &mut World) {
@@ -50,15 +55,11 @@ fn rotate_col(x: i32, y: i32, ecs: &mut World) {
         }
     }
     gamedata.level = 10;
-    //println!("{:?}", gamedata.hexes.get(x as usize, y as usize)); 
 }
 
 fn set_time(ecs: &mut World) {
-    let mut gamedata = ecs.write_storage::<data::Gamedata>();
-    for item in (&mut gamedata).join() { // Without the parentheses the whole thing is fucked.
-        println!("{:?}", item);
-        println!("hello");
-    }
+    let mut gamedata = ecs.write_resource::<data::Gamedata>();
+    gamedata.time -= 1;
 }
 
 impl GameState for State {
@@ -83,9 +84,9 @@ impl GameState for State {
                 }
             }
         }
-        ctx.print_color(2, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.level);
-        ctx.print_color(12, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.score);
-        ctx.print_color(22, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), gamedata.time);
+        ctx.print_color(2, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:x}", gamedata.level));
+        ctx.print_color(12, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:x}", gamedata.score));
+        ctx.print_color(22, 19, RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 0.0, 0.0), format!("{:08x}", gamedata.time));
     }
 }
 
