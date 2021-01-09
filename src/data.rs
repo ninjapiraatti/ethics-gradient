@@ -7,8 +7,6 @@ pub struct Gamedata {
     pub level:      u32,
     pub score:      u32,
     pub time:       u32,
-    pub running:    bool,
-    pub gameover:   bool,
 }
 
 #[derive(Component, Debug)]

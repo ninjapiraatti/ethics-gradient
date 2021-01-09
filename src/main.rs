@@ -4,6 +4,7 @@ extern crate specs_derive;  // Apparently this is not needed for the "new" versi
 extern crate array2d;
 use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
 use specs::prelude::*;
+//use std::time::{SystemTime, UNIX_EPOCH};
 //use std::cmp::{max, min};
 //use specs_derive::Component;
 mod hexes;
@@ -23,32 +24,25 @@ pub fn init_gamedata() -> data::Gamedata {
         level:      1,
         score:      0,
         time:       2147483647,
-        running:    false,
-        gameover:   false,
     };
     gamedata
 }
 
-fn player_input(gs: &mut State, ctx: &mut Rltk)
-{
+fn player_input(gs: &mut State, ctx: &mut Rltk) -> i32 {
     match ctx.key {
-        None => {}
+        None => {0}
         Some(key) => match key {
             VirtualKeyCode::Left => rotate_col(-1, 0, &mut gs.ecs),
             VirtualKeyCode::Right => rotate_col(1, 0, &mut gs.ecs),
             VirtualKeyCode::Up => rotate_col(0, -1, &mut gs.ecs),
             VirtualKeyCode::Down => rotate_col(0, 1, &mut gs.ecs),
-            VirtualKeyCode::Space => finish_level(&mut gs.ecs),
-            _ => {}
+            VirtualKeyCode::Space => 2,
+            _ => {0}
         },
     }
 }
 
-fn finish_level(ecs: &mut World) {
-    println!("Finished level!");
-}
-
-fn rotate_col(x: i32, y: i32, ecs: &mut World) {
+fn rotate_col(x: i32, y: i32, ecs: &mut World) -> i32 {
     let mut positions = ecs.write_storage::<data::Position>();
     let mut gamedata = ecs.write_resource::<data::Gamedata>();
     for pos in (&mut positions).join() { // Without the parentheses the whole thing is fucked.
@@ -61,6 +55,7 @@ fn rotate_col(x: i32, y: i32, ecs: &mut World) {
         }
         gamedata.hexes.set(pos.x as usize, pos.y as usize,10).ok();
     }
+    1
 }
 
 fn set_time(ecs: &mut World) {
@@ -71,8 +66,10 @@ fn set_time(ecs: &mut World) {
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
+        if player_input(self, ctx) == 2 && self.runstate == RunState::Start {
+            self.runstate = RunState::Running;
+        }
         if self.runstate == RunState::Running {
-            player_input(self, ctx);
             set_time(&mut self.ecs);
             let gamedata = self.ecs.fetch::<data::Gamedata>();
             let positions = self.ecs.read_storage::<data::Position>();
@@ -110,7 +107,7 @@ fn main() -> rltk::BError {
     context.with_post_scanlines(true);
     let mut gs = State {
         ecs: World::new(),
-        runstate : RunState::Gameover
+        runstate : RunState::Start
     };
     gs.ecs.register::<data::Position>();
     gs.ecs.register::<data::Gamedata>();
