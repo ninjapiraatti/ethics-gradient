@@ -2,8 +2,11 @@ extern crate rltk;
 extern crate specs; 
 extern crate specs_derive;  // Apparently this is not needed for the "new" versions of Rust?
 extern crate array2d;
+extern crate rand;
 use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
 use specs::prelude::*;
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
 //use std::time::{SystemTime, UNIX_EPOCH};
 //use std::cmp::{max, min};
 //use specs_derive::Component;
@@ -63,6 +66,21 @@ fn set_time(ecs: &mut World) {
     gamedata.time -= 10;
 }
 
+fn random_string(n: usize) -> String {
+    thread_rng().sample_iter(&Alphanumeric)
+        .take(n)
+        .collect()
+}
+
+fn flash_character() -> (i32, i32) {
+    let mut rng = rand::thread_rng();
+    if rng.gen_range(0, 10) == 6 {
+        (rng.gen_range(0, 41), rng.gen_range(0, 42))
+    } else {
+        (-1, -1)
+    }
+}
+
 impl GameState for State {
     fn tick(&mut self, ctx : &mut Rltk) {
         ctx.cls();
@@ -96,6 +114,8 @@ impl GameState for State {
         } else {
             ctx.print_color(2, 2, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), "Game over.");
         }
+        let flashcoords = flash_character();
+        ctx.print_color(flashcoords.0, flashcoords.1, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), "#");
     }
 }
 
