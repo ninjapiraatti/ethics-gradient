@@ -74,7 +74,7 @@ fn random_string(n: usize) -> String {
 
 fn flash_character() -> (i32, i32) {
     let mut rng = rand::thread_rng();
-    if rng.gen_range(0, 10) == 6 {
+    if rng.gen_range(0, 100) == 6 {
         (rng.gen_range(0, 41), rng.gen_range(0, 42))
     } else {
         (-1, -1)
@@ -115,7 +115,7 @@ impl GameState for State {
             ctx.print_color(2, 2, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), "Game over.");
         }
         let flashcoords = flash_character();
-        ctx.print_color(flashcoords.0, flashcoords.1, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), "#");
+        ctx.print_color(flashcoords.0, flashcoords.1, RGB::from_f32(1.0, 0.0, 0.0), RGB::from_f32(0.0, 0.0, 0.0), random_string(1));
     }
 }
 

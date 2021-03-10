@@ -14,7 +14,7 @@ pub fn generate_hex(_n: u32, lvl: u32) -> Array2D<u32> {
     //let mut hexes = Array2D::from_rows(&rows);
     let mut rng = rand::thread_rng();
     //let mut nbr = 0;
-	for i in 0..lvl {
+	for _ in 0..lvl {
 		numbers.push(rng.gen_range(0, 2147483647));
 	}
 
