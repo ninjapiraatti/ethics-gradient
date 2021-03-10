@@ -66,14 +66,13 @@ fn rotate_col(y: i32, ecs: &mut World) -> i32 {
     let mut positions = ecs.write_storage::<data::Position>();
     let mut gamedata = ecs.write_resource::<data::Gamedata>();
     for pos in (&mut positions).join() { // Without the parentheses the whole thing is fucked.
-        pos.y += y;
-		if pos.y == 17 {
-			pos.y = 1;
+        if y == -1 {
+			let value = *gamedata.hexes.get(15, pos.x as usize).unwrap(); // Currently panics?
+			gamedata.hexes.set(0, pos.x as usize, value).ok();
+			for row in 0..hexes::ROWS {
+				gamedata.hexes.set(row, pos.x as usize, 11).ok();
+			}
 		}
-		if pos.y == 0 {
-			pos.y = 17;
-		}
-        gamedata.hexes.set(pos.y as usize, 1, 11).ok();
     }
     1
 }
