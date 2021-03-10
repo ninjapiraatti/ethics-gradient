@@ -35,28 +35,45 @@ fn player_input(gs: &mut State, ctx: &mut Rltk) -> i32 {
     match ctx.key {
         None => {0}
         Some(key) => match key {
-            VirtualKeyCode::Left => rotate_col(-1, 0, &mut gs.ecs),
-            VirtualKeyCode::Right => rotate_col(1, 0, &mut gs.ecs),
-            VirtualKeyCode::Up => rotate_col(0, -1, &mut gs.ecs),
-            VirtualKeyCode::Down => rotate_col(0, 1, &mut gs.ecs),
+            VirtualKeyCode::Left => swap_hex(-1, &mut gs.ecs),
+            VirtualKeyCode::Right => swap_hex(1, &mut gs.ecs),
+            VirtualKeyCode::Up => rotate_col(-1, &mut gs.ecs),
+            VirtualKeyCode::Down => rotate_col(1, &mut gs.ecs),
             VirtualKeyCode::Space => 2,
             _ => {0}
         },
     }
 }
 
-fn rotate_col(x: i32, y: i32, ecs: &mut World) -> i32 {
+fn swap_hex(x: i32, ecs: &mut World) -> i32 {
     let mut positions = ecs.write_storage::<data::Position>();
     let mut gamedata = ecs.write_resource::<data::Gamedata>();
     for pos in (&mut positions).join() { // Without the parentheses the whole thing is fucked.
         println!("{:?}", pos);
-        if pos.x + x > 0 && pos.x + x < 5 {
-            pos.x += x;
-        }
-        if pos.y + y > 1 && pos.y + y < 18 {
-            pos.y += y;
-        }
-        gamedata.hexes.set(pos.y as usize, pos.x as usize, 11).ok();
+        pos.x += x;
+		if pos.x == 5 {
+			pos.x = 1;
+		}
+		if pos.x == 0 {
+			pos.x = 4;
+		}
+        gamedata.hexes.set(1, pos.x as usize, 11).ok();
+    }
+    1
+}
+
+fn rotate_col(y: i32, ecs: &mut World) -> i32 {
+    let mut positions = ecs.write_storage::<data::Position>();
+    let mut gamedata = ecs.write_resource::<data::Gamedata>();
+    for pos in (&mut positions).join() { // Without the parentheses the whole thing is fucked.
+        pos.y += y;
+		if pos.y == 17 {
+			pos.y = 1;
+		}
+		if pos.y == 0 {
+			pos.y = 17;
+		}
+        gamedata.hexes.set(pos.y as usize, 1, 11).ok();
     }
     1
 }
