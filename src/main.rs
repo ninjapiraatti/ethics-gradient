@@ -23,7 +23,7 @@ pub enum RunState { Start, Running, Gameover }
 
 pub fn init_gamedata() -> data::Gamedata {
     let gamedata = data::Gamedata {
-        hexes:      hexes::generate_hex(1),
+        hexes:      hexes::generate_hex(1, 5),
         level:      1,
         score:      0,
         time:       2147483647,

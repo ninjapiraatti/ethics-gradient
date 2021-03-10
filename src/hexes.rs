@@ -8,15 +8,19 @@ pub const ROWS: usize = 16;
 //pub const UP:   usize = 0;
 //pub const DOWN: usize = 1;
 
-pub fn generate_hex(_n: u32) -> Array2D<u32> {
+pub fn generate_hex(_n: u32, lvl: u32) -> Array2D<u32> {
     let mut hexes = Array2D::filled_with(2, 16, 4);
+	let mut numbers: Vec<u32> = vec![];
     //let mut hexes = Array2D::from_rows(&rows);
     let mut rng = rand::thread_rng();
     //let mut nbr = 0;
+	for i in 0..lvl {
+		numbers.push(rng.gen_range(0, 2147483647));
+	}
 
     for row in 0..ROWS {
         for col in 0..COLS {
-            hexes.set(row, col, rng.gen_range(0, 2147483647)).ok(); // What exactly does ok() do besides get rid of unused warning?
+            hexes.set(row, col, numbers[rng.gen_range(0, lvl) as usize] + col as u32).ok(); // What exactly does ok() do besides get rid of unused warning?
             //println!("Row is {}, Col is {}, value is {}", row, col, hexes[(row, col)]);
         }
     }
