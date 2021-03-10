@@ -56,7 +56,7 @@ fn rotate_col(x: i32, y: i32, ecs: &mut World) -> i32 {
         if pos.y + y > 1 && pos.y + y < 18 {
             pos.y += y;
         }
-        gamedata.hexes.set(pos.x as usize, pos.y as usize,10).ok();
+        gamedata.hexes.set(pos.y as usize, pos.x as usize, 11).ok();
     }
     1
 }
